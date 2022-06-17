@@ -10,7 +10,8 @@
     "format": "prettier --write \"*.{js,ts}\"",
     "format-staged": "pretty-quick --staged --pattern \"*.{js,ts}\"",
     "lint": "tsc",
-    "test": "'tap test/*.js | tap-arc'"
+    "test": "'tap test/*.js | tap-arc'",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
-    "husky": "^8.0.0",
+    "husky": "^7.0.4",
     "level": "^8.0.0",
     "p-defer": "^4.0.0",
     "prettier": "^2.7.1",
@@ -53,11 +54,6 @@
     "tap": "^16.3.0",
     "tap-arc": "^0.3.4",
     "typescript": "~4.7.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format-staged && npm run lint"
-    }
   },
   "prettier": {
     "semi": false,
