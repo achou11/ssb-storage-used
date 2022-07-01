@@ -36,11 +36,7 @@ module.exports = {
       })
     }
 
-    /**
-     * @param {string} feedId
-     * @returns {*}
-     */
-    function stream(feedId) {
+    function stream() {
       const indexPlugin = ssb.db.getIndex('storageUsed')
       return indexPlugin.stream()
     }
