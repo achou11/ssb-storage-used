@@ -42,7 +42,7 @@ module.exports = {
      */
     function stream(feedId) {
       const indexPlugin = ssb.db.getIndex('storageUsed')
-      return pull(indexPlugin.stream())
+      return indexPlugin.stream()
     }
 
     return { getBytesStored, stream }
