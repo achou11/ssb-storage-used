@@ -7,7 +7,7 @@ const Plugin = require('ssb-db2/indexes/plugin')
 const BIPF_AUTHOR = bipf.allocAndEncode('author')
 
 // Index of feedId to storage used in bytes
-class StorageUsed extends Plugin {
+module.exports = class StorageUsed extends Plugin {
   /**
    *
    * @param {*} log
@@ -22,31 +22,14 @@ class StorageUsed extends Plugin {
     this.bytesStored = new Map()
   }
 
-  // TODO: TS throws a type error (TS2425) if this isn't an arrow function
-  onLoaded = (cb) => {
-    pull(
-      pl.read(this.level, {
-        gte: '',
-        lte: undefined,
-        keyEncoding: this.keyEncoding,
-        valueEncoding: this.valueEncoding,
-        keys: true,
-      }),
-      pull.drain(
-        (data) => {
-          this.bytesStored.set(data.key, data.value)
-        },
-        (err) => {
-          if (err && err !== true) {
-            cb(clarify(err, 'StorageUsed.onLoaded() failed'))
-          } else cb()
-        }
-      )
-    )
-  }
+  // To appease:
+  //  > TS2653: Non-abstract class expression does not implement inherited
+  //  > abstract member 'onLoaded' from class 'Plugin'.
+  onLoaded = undefined
 
-  // TODO: TS throws a type error (TS2425) if this isn't an arrow function
-  reset = () => {
+  // See https://github.com/Microsoft/TypeScript/issues/27965 for relevant details
+  // @ts-ignore
+  reset() {
     this.bytesStored.clear()
   }
 
@@ -63,16 +46,15 @@ class StorageUsed extends Plugin {
     this.batch.push({
       type: 'put',
       key: author,
-      value: this.updateBytesStored(author, buf.length),
+      value: this._updateBytesStored(author, buf.length),
     })
   }
 
   /**
-   *
    * @param {string} author
    * @param {number} bufferLength
    */
-  updateBytesStored(author, bufferLength) {
+  _updateBytesStored(author, bufferLength) {
     const newTotal = (this.bytesStored.get(author) || 0) + bufferLength
     this.bytesStored.set(author, newTotal)
     return newTotal
@@ -83,22 +65,5 @@ class StorageUsed extends Plugin {
    */
   getBytesStored(feedId) {
     return this.bytesStored.get(feedId) || 0
-  }
-
-  /**
-   *
-   * @param {string} feedId
-   * @returns {*}
-   */
-  getLiveBytesStored(feedId) {
-    return pl.read(this.level, {
-      gte: feedId,
-      lte: feedId,
-      keyEncoding: this.keyEncoding,
-      valueEncoding: this.valueEncoding,
-      keys: false,
-      live: true,
-      old: false,
-    })
   }
 }

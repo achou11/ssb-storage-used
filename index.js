@@ -12,12 +12,12 @@ module.exports = {
   name: 'storageUsed',
   version: '1.0.0',
   manifest: {
-    get: 'async',
+    getBytesStored: 'async',
     stream: 'source',
   },
   permissions: {
     master: {
-      allow: ['get', 'stream'],
+      allow: ['getBytesUsed', 'stream'],
     },
   },
   /**
@@ -29,9 +29,9 @@ module.exports = {
     /**
      * Get the storage capacity used for a specfic feed id
      * @param {string} feedId
-     * @param {import('./types').CB<any>} cb
+     * @param {import('./types').CB<number>} cb
      */
-    function get(feedId, cb) {
+    function getBytesStored(feedId, cb) {
       const indexPlugin = ssb.db.getIndex('storageUsed')
       ssb.db.onDrain('storageUsed', () => {
         cb(null, indexPlugin.getBytesStored(feedId))
@@ -48,14 +48,12 @@ module.exports = {
         // First deliver latest field value
         pull(
           pullAsync((/** @type {import('./types').CB<any>}*/ cb) => {
-            get(feedId, cb)
+            getBytesStored(feedId, cb)
           })
         ),
-        // Then deliver live field values
-        indexPlugin.getLiveBytesStored(feedId),
       ])
     }
 
-    return { get, stream }
+    return { getBytesStored, stream }
   },
 }
