@@ -1,6 +1,4 @@
 const pull = require('pull-stream')
-const pullAsync = require('pull-async')
-const cat = require('pull-cat')
 
 const IndexPlugin = require('./plugin')
 
@@ -29,7 +27,7 @@ module.exports = {
     /**
      * Get the storage capacity used for a specfic feed id
      * @param {string} feedId
-     * @param {import('./types').CB<number>} cb
+     * @param {import('./types').CB<any>} cb
      */
     function getBytesStored(feedId, cb) {
       const indexPlugin = ssb.db.getIndex('storageUsed')
@@ -44,14 +42,7 @@ module.exports = {
      */
     function stream(feedId) {
       const indexPlugin = ssb.db.getIndex('storageUsed')
-      return cat([
-        // First deliver latest field value
-        pull(
-          pullAsync((/** @type {import('./types').CB<any>}*/ cb) => {
-            getBytesStored(feedId, cb)
-          })
-        ),
-      ])
+      return pull(indexPlugin.stream())
     }
 
     return { getBytesStored, stream }
