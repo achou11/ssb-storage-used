@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ssb-db2 plugin for storage used per feed",
   "main": "index.js",
-  "egines": {
+  "engines": {
     "node": ">=12"
   },
   "scripts": {
