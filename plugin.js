@@ -63,17 +63,17 @@ class StorageUsed extends Plugin {
     this.batch.push({
       type: 'put',
       key: author,
-      value: this.updateBytesStored(author, buf.byteLength),
+      value: this.updateBytesStored(author, buf.length),
     })
   }
 
   /**
    *
    * @param {string} author
-   * @param {number} byteLength
+   * @param {number} bufferLength
    */
-  updateBytesStored(author, byteLength) {
-    const newTotal = this.bytesStored.get(author) || 0 + byteLength
+  updateBytesStored(author, bufferLength) {
+    const newTotal = this.bytesStored.get(author) || 0 + bufferLength
     this.bytesStored.set(author, newTotal)
     return newTotal
   }
