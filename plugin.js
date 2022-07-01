@@ -73,7 +73,7 @@ class StorageUsed extends Plugin {
    * @param {number} bufferLength
    */
   updateBytesStored(author, bufferLength) {
-    const newTotal = this.bytesStored.get(author) || 0 + bufferLength
+    const newTotal = (this.bytesStored.get(author) || 0) + bufferLength
     this.bytesStored.set(author, newTotal)
     return newTotal
   }
