@@ -1,13 +1,27 @@
+const fs = require('fs/promises')
 const bipf = require('bipf')
 const clarify = require('clarify-error')
 const pullLevel = require('pull-level')
 const pull = require('pull-stream')
+const { newLogPath, indexesPath } = require('ssb-db2/defaults')
 const Plugin = require('ssb-db2/indexes/plugin')
+const trammel = require('trammel')
+
+const TRAMMEL_OPTIONS = { type: 'raw' }
 
 const BIPF_AUTHOR = bipf.allocAndEncode('author')
 
 // See https://github.com/achou11/ssb-storage-used/issues/4 for context
 const PREFIX_FACTOR = 1 / Math.log2(1.1)
+
+/**
+ * @param {string} logPath
+ * @returns {Promise<number>}
+ */
+async function getLogFileSize(logPath) {
+  const { size } = await fs.stat(logPath)
+  return size
+}
 
 // Index of feedId to storage used in bytes
 module.exports = class StorageUsed extends Plugin {
@@ -30,6 +44,12 @@ module.exports = class StorageUsed extends Plugin {
      * @type {Map<string, string>}
      */
     this.feedIdToPrefix = new Map()
+
+    /** @type {string} */
+    this.db2LogPath = newLogPath(dir)
+
+    /** @type {string} */
+    this.db2IndexesPath = indexesPath(dir)
   }
 
   // See https://github.com/Microsoft/TypeScript/issues/27965 for relevant details
@@ -103,6 +123,41 @@ module.exports = class StorageUsed extends Plugin {
    */
   getBytesStored(feedId) {
     return this.bytesStored.get(feedId) || 0
+  }
+
+  /**
+   * @param {string} blobsPath
+   * @param {import('./types').CB<any>} cb
+   */
+  async getStats(blobsPath, cb) {
+    /** @type {[PromiseSettledResult<number>, PromiseSettledResult<number>, PromiseSettledResult<number>]} */
+    const results = await Promise.allSettled([
+      trammel(blobsPath, TRAMMEL_OPTIONS),
+      trammel(this.db2IndexesPath, TRAMMEL_OPTIONS),
+      getLogFileSize(this.db2LogPath),
+    ])
+
+    const rejected = /** @type {PromiseRejectedResult[]} */ (
+      results.filter((r) => r.status === 'rejected')
+    )
+
+    if (rejected.length > 0) {
+      rejected.forEach((r) => console.error(r.reason))
+      // TODO: What error do we send here?
+      cb(new Error('Issue getting results'))
+      return
+    }
+
+    const [blobsResult, indexesResult, logResult] =
+      /** @type {[PromiseFulfilledResult<number>, PromiseFulfilledResult<number>, PromiseFulfilledResult<number>]} */ (
+        results
+      )
+
+    cb(null, {
+      blobs: blobsResult.value,
+      indexes: indexesResult.value,
+      log: logResult.value,
+    })
   }
 
   stream() {

@@ -14,3 +14,7 @@ export interface SSB {
     registerIndex: CallableFunction
   }
 }
+
+export interface SSBConfig {
+  path: string
+}
