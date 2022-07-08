@@ -76,5 +76,6 @@ pull(
 )
 ```
 
+## License
 
-
+MIT
