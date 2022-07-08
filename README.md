@@ -30,8 +30,6 @@ Example Usage:
 
 Gets the total number of bytes stored on disk for a provided `feedId`
 
-Example:
-
 ```js
 ssb.storageUsed.getBytesStored(ssb.id, (err, bytesStored) => {
   console.log(`Feed ${ssb.id} uses ${bytesStored} bytes`)
@@ -50,8 +48,6 @@ ssb.storageUsed.getBytesStored(ssb.id, (err, bytesStored) => {
 
 Get information about how much disk space `ssb/db2` takes up. This includes the log file, the indexes directories, and the blobs directories.
 
-Example:
-
 ```js
 ssb.storageUsed.stats((err, stats) => {
   Object.entries(stats).forEach(([name, bytesStored]) => {
@@ -66,6 +62,8 @@ Get a pull stream that sends a `Chunk`s sorted by feeds taking up the most stora
 
   - `feed`: the feed id
   - `total`: the total number of bytes used by the feed
+
+The items in each chunk are sorted from the highest to lowest `total` values.
 
 ```js
 pull(
