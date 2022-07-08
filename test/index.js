@@ -66,3 +66,22 @@ test('generate fixture', (t) => {
     )
   })
 })
+
+test('stats', (t) => {
+  const sbot = createSbot()
+
+  // Log size for seed 'tiny'
+  const expectedLogSize = 8257536
+
+  sbot.storageUsed.stats((err, stats) => {
+    t.equal(stats.blobs, 0, 'blob size is 0')
+    t.ok(stats.indexes > 0, 'indexes is non-zero')
+    t.equal(
+      stats.log,
+      expectedLogSize,
+      `log is expected size for seed '${SEED}'`
+    )
+
+    sbot.close(true, t.end)
+  })
+})
