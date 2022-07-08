@@ -1,7 +1,7 @@
 {
   "name": "ssb-storage-used",
   "version": "1.0.0",
-  "description": "ssb-db2 plugin for storage used per feed",
+  "description": "secret stack plugin for getting storage usage information",
   "main": "index.js",
   "engines": {
     "node": ">=12"
