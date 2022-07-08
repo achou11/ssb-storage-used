@@ -31,7 +31,7 @@ module.exports = class StorageUsed extends Plugin {
    * @param {*} dir
    */
   constructor(log, dir) {
-    super(log, dir, 'storageUsed', 1, 'json', 'json')
+    super(log, dir, 'storageUsed', 1, undefined, undefined)
 
     /**
      * Map of feedId to bytes stored
@@ -55,16 +55,14 @@ module.exports = class StorageUsed extends Plugin {
   // See https://github.com/Microsoft/TypeScript/issues/27965 for relevant details
   // @ts-expect-error
   onLoaded(cb) {
+    const META = '\x00'
     pull(
-      pullLevel.read(this.level, {
-        gt: '\x00',
-        keyEncoding: this.keyEncoding,
-        valueEncoding: this.valueEncoding,
-        keys: true,
-      }),
+      pullLevel.read(this.level, { gt: META }),
       pull.drain(
-        (data) => {
-          this.bytesStored.set(data.key, data.value)
+        ({ key, value }) => {
+          const [prefix, author] = this._unpackKey(key)
+          this.bytesStored.set(author, value)
+          this.feedIdToPrefix.set(author, prefix)
         },
         (err) => {
           if (err && err !== true) {
@@ -82,7 +80,19 @@ module.exports = class StorageUsed extends Plugin {
     this.feedIdToPrefix.clear()
   }
 
+  _packKey(prefix, author) {
+    return prefix + author
+  }
+
+  _unpackKey(key) {
+    const prefix = key.slice(0, 2)
+    const author = key.slice(2)
+    return [prefix, author]
+  }
+
   /**
+   * <PREFIX><AUTHOR>:string => bytes:number
+   *
    * @param {import('./types').BipfRecord} record
    * @param {number} seq
    * @param {number} pValue
@@ -94,15 +104,16 @@ module.exports = class StorageUsed extends Plugin {
 
     const size = this._calculateBytesStored(author, buf.length)
     const prefix = this._calculatePrefix(size)
-    const key = prefix + author
+    const key = this._packKey(prefix, author)
 
     const prevPrefix = this.feedIdToPrefix.get(author)
     const prefixHasChanged = prevPrefix !== prefix
 
     if (prevPrefix && prefixHasChanged) {
+      const prevKey = this._packKey(prevPrefix, author)
       this.batch.push({
         type: 'del',
-        key: prevPrefix + author,
+        key: prevKey,
       })
     }
 
@@ -114,7 +125,9 @@ module.exports = class StorageUsed extends Plugin {
 
     // Update in-memory maps
     this.bytesStored.set(author, size)
-    if (prefixHasChanged) this.feedIdToPrefix.set(author, prefix)
+    if (!this.feedIdToPrefix.has(author) || prefixHasChanged) {
+      this.feedIdToPrefix.set(author, prefix)
+    }
   }
 
   /**
@@ -122,6 +135,7 @@ module.exports = class StorageUsed extends Plugin {
    * @returns {number}
    */
   getBytesStored(feedId) {
+    const prefix = this.feedIdToPrefix.get(feedId)
     return this.bytesStored.get(feedId) || 0
   }
 
@@ -142,9 +156,8 @@ module.exports = class StorageUsed extends Plugin {
     )
 
     if (rejected.length > 0) {
-      rejected.forEach((r) => console.error(r.reason))
-      // TODO: What error do we send here?
-      cb(new Error('Issue getting results'))
+      const err = new Error(rejected[0].reason)
+      cb(clarify(err, 'StorageUsed.getStats failed'))
       return
     }
 
@@ -161,28 +174,24 @@ module.exports = class StorageUsed extends Plugin {
   }
 
   stream() {
-    const { level } = this
+    const self = this
     let prefix = 0
-    return (errOrEnd, cb) => {
+    return function chunkedStream(errOrEnd, cb) {
       if (errOrEnd) return cb(errOrEnd)
       if (++prefix >= 100) return cb(true)
 
-      const stringPrefix = this._createPrefixString(prefix)
+      const stringPrefix = self._createPrefixString(prefix)
 
       pull(
-        pullLevel.read(level, {
+        pullLevel.read(self.level, {
           gte: stringPrefix,
           lte: stringPrefix + '~',
           keys: true,
           values: true,
         }),
-        pull.collect((err, items) => {
-          items.sort((a, b) => {
-            const valueA = a.value
-            const valueB = b.value
-            return valueB - valueA
-          })
-          cb(null, items)
+        pull.collect((err, chunk) => {
+          chunk.sort((a, b) => b.value - a.value)
+          cb(null, chunk)
         })
       )
     }

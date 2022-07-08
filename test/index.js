@@ -9,13 +9,13 @@ const ssbKeys = require('ssb-keys')
 const pull = require('pull-stream')
 
 const SEED = 'tiny'
-const MESSAGES = 10000
-const AUTHORS = 500
+const MESSAGES = 1000
+const AUTHORS = 10
 
 tmp.setGracefulCleanup()
 
 const { name: fixtureDirPath } = tmp.dirSync({
-  name: 'ssb-storage-used',
+  name: `ssb-storage-used-${Date.now()}`,
   unsafeCleanup: true,
 })
 
@@ -57,10 +57,7 @@ test('generate fixture', (t) => {
       pull.drain(() => {
         setTimeout(() => {
           t.true(fs.existsSync(newLogPath), 'ssb-db2 migration completed')
-
-          sbot.db.onDrain('search', () => {
-            sbot.close(true, t.end)
-          })
+          sbot.close(true, t.end)
         }, 1000)
       })
     )
@@ -70,8 +67,8 @@ test('generate fixture', (t) => {
 test('stats', (t) => {
   const sbot = createSbot()
 
-  // Log size for seed 'tiny'
-  const expectedLogSize = 8257536
+  // Log size for seed 'tiny' with 1000 messages
+  const expectedLogSize = 851968
 
   sbot.storageUsed.stats((err, stats) => {
     t.equal(stats.blobs, 0, 'blob size is 0')
@@ -82,6 +79,16 @@ test('stats', (t) => {
       `log is expected size for seed '${SEED}'`
     )
 
+    sbot.close(true, t.end)
+  })
+})
+
+test('getBytesStored', (t) => {
+  const sbot = createSbot()
+
+  sbot.storageUsed.getBytesStored(sbot.id, (err, bytesStored) => {
+    t.error(err)
+    t.ok(bytesStored > 0, `bytes stored for author is non-zero`)
     sbot.close(true, t.end)
   })
 })
