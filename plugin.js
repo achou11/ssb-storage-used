@@ -9,6 +9,15 @@ const BIPF_AUTHOR = bipf.allocAndEncode('author')
 // See https://github.com/achou11/ssb-storage-used/issues/4 for context
 const PREFIX_FACTOR = 1 / Math.log2(1.1)
 
+/**
+ * @param {string | number} value
+ * @returns {number}
+ */
+function toInt(value) {
+  if (typeof value === 'number') return value
+  return parseInt(value, 10)
+}
+
 // Index of feedId to storage used in bytes
 module.exports = class StorageUsed extends Plugin {
   /**
@@ -41,7 +50,7 @@ module.exports = class StorageUsed extends Plugin {
       pull.drain(
         ({ key, value }) => {
           const [prefix, author] = this._unpackKey(key)
-          this.bytesStored.set(author, value)
+          this.bytesStored.set(author, toInt(value))
           this.feedIdToPrefix.set(author, prefix)
         },
         (err) => {
@@ -122,7 +131,7 @@ module.exports = class StorageUsed extends Plugin {
   stream() {
     const self = this
     let prefix = 0
-    return function chunkedStream(errOrEnd, cb) {
+    function chunkedStream(errOrEnd, cb) {
       if (errOrEnd) return cb(errOrEnd)
       if (++prefix >= 100) return cb(true)
 
@@ -136,11 +145,20 @@ module.exports = class StorageUsed extends Plugin {
           values: true,
         }),
         pull.collect((err, chunk) => {
-          chunk.sort((a, b) => b.value - a.value)
-          cb(null, chunk)
+          cb(
+            null,
+            chunk
+              .map((c) => ({ feed: c.key, total: toInt(c.value) }))
+              .sort((a, b) => b.total - a.total)
+          )
         })
       )
     }
+
+    return pull(
+      chunkedStream,
+      pull.filter((chunk) => chunk.length > 0)
+    )
   }
 
   /**

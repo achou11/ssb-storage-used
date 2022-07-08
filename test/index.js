@@ -93,3 +93,27 @@ test('getBytesStored', (t) => {
     sbot.close(true, t.end)
   })
 })
+
+test('stream', (t) => {
+  const sbot = createSbot()
+
+  pull(
+    sbot.storageUsed.stream(),
+    pull.collect((err, chunks) => {
+      t.ok(!chunks.find((c) => c.length === 0), 'no empty chunks are returned')
+
+      const flattened = chunks.flat()
+
+      const isMonotonicallyDecreasing = flattened
+        .map(({ total }) => total)
+        .every((current, index, array) => !index || array[index - 1] >= current)
+
+      const authorsCount = new Set(flattened.map(({ feed }) => feed)).size
+
+      t.ok(isMonotonicallyDecreasing, 'results are monotonically decreasing')
+      t.equal(authorsCount, AUTHORS, 'every feed is accounted for')
+
+      sbot.close(true, t.end)
+    })
+  )
+})
