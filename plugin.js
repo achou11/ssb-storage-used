@@ -53,7 +53,7 @@ module.exports = class StorageUsed extends Plugin {
   }
 
   // See https://github.com/Microsoft/TypeScript/issues/27965 for relevant details
-  // @ts-ignore
+  // @ts-expect-error
   onLoaded(cb) {
     pull(
       pullLevel.read(this.level, {
@@ -76,7 +76,7 @@ module.exports = class StorageUsed extends Plugin {
   }
 
   // See https://github.com/Microsoft/TypeScript/issues/27965 for relevant details
-  // @ts-ignore
+  // @ts-expect-error
   reset() {
     this.bytesStored.clear()
     this.feedIdToPrefix.clear()
