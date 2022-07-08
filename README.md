@@ -19,8 +19,6 @@ SecretStack({appKey: require('ssb-caps').shs})
   .call(null, config)
 ```
 
-Example Usage:
-
 ## API
 
 ### `ssb.storageUsed.getBytesStored(feedId, cb) (muxrpc "async")`
