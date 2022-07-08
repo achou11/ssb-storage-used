@@ -1,6 +1,8 @@
 const path = require('path')
 const pull = require('pull-stream')
+const { newLogPath, indexesPath, jitIndexesPath } = require('ssb-db2/defaults')
 
+const getStats = require('./stats')
 const IndexPlugin = require('./plugin')
 
 /**
@@ -29,8 +31,6 @@ module.exports = {
    * @param {SSBConfig} config
    */
   init(ssb, config) {
-    const blobsPath = path.join(config.path, 'blobs')
-
     ssb.db.registerIndex(IndexPlugin)
 
     /**
@@ -50,10 +50,8 @@ module.exports = {
      * @param {import('./types').CB<any>} cb
      */
     function stats(cb) {
-      /** @type {IndexPlugin} */
-      const indexPlugin = ssb.db.getIndex('storageUsed')
       ssb.db.onDrain('storageUsed', () => {
-        indexPlugin.getStats(blobsPath, cb)
+        getStats(config.path, cb)
       })
     }
 

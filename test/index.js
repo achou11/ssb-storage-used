@@ -73,6 +73,7 @@ test('stats', (t) => {
   sbot.storageUsed.stats((err, stats) => {
     t.equal(stats.blobs, 0, 'blob size is 0')
     t.ok(stats.indexes > 0, 'indexes is non-zero')
+    t.equal(stats.jitIndexes, 0, 'jit indexes is 0')
     t.equal(
       stats.log,
       expectedLogSize,
