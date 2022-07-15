@@ -1,5 +1,6 @@
 const bipf = require('bipf')
 const clarify = require('clarify-error')
+// @ts-expect-error
 const pullLevel = require('pull-level')
 const pull = require('pull-stream')
 const Plugin = require('ssb-db2/indexes/plugin')
@@ -69,10 +70,19 @@ module.exports = class StorageUsed extends Plugin {
     this.feedIdToPrefix.clear()
   }
 
+  /**
+   * @param {string} prefix
+   * @param {string} author
+   * @returns
+   */
   _packKey(prefix, author) {
     return prefix + author
   }
 
+  /**
+   * @param {string} key
+   * @returns {[string, string]}
+   */
   _unpackKey(key) {
     const prefix = key.slice(0, 2)
     const author = key.slice(2)
@@ -82,7 +92,7 @@ module.exports = class StorageUsed extends Plugin {
   /**
    * <PREFIX><AUTHOR>:string => bytes:number
    *
-   * @param {import('./types').BipfRecord} record
+   * @param {import('./types/helpers').BipfRecord} record
    * @param {number} seq
    * @param {number} pValue
    */
@@ -131,6 +141,11 @@ module.exports = class StorageUsed extends Plugin {
   stream() {
     const self = this
     let prefix = 0
+
+    /**
+     * @param {*} errOrEnd
+     * @param {import('./types/helpers').CB<*>} cb
+     */
     function chunkedStream(errOrEnd, cb) {
       if (errOrEnd) return cb(errOrEnd)
       if (++prefix >= 100) return cb(true)

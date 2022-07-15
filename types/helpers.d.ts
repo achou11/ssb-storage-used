@@ -19,13 +19,6 @@ export interface SSBConfig {
   path: string
 }
 
-export type StatsPromiseSettledResults = [
-  PromiseSettledResult<number>,
-  PromiseSettledResult<number>,
-  PromiseSettledResult<number>,
-  PromiseSettledResult<number>
-]
-
 export type StatsPromiseFulfilledResults = [
   PromiseFulfilledResult<number>,
   PromiseFulfilledResult<number>,

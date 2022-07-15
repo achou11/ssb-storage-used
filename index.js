@@ -1,16 +1,15 @@
 const path = require('path')
 const pull = require('pull-stream')
-const { newLogPath, indexesPath, jitIndexesPath } = require('ssb-db2/defaults')
 
 const getStats = require('./stats')
 const IndexPlugin = require('./plugin')
 
 /**
- * @typedef {import('./types').SSB} SSB
+ * @typedef {import('./types/helpers').SSB} SSB
  */
 
 /**
- * @typedef {import('./types').SSBConfig} SSBConfig
+ * @typedef {import('./types/helpers').SSBConfig} SSBConfig
  */
 
 module.exports = {
@@ -36,7 +35,7 @@ module.exports = {
     /**
      * Get the storage capacity used for a specfic feed id
      * @param {string} feedId
-     * @param {import('./types').CB<any>} cb
+     * @param {import('./types/helpers').CB<*>} cb
      */
     function getBytesStored(feedId, cb) {
       /** @type {IndexPlugin} */
@@ -47,7 +46,7 @@ module.exports = {
     }
 
     /**
-     * @param {import('./types').CB<any>} cb
+     * @param {import('./types/helpers').CB<*>} cb
      */
     function stats(cb) {
       ssb.db.onDrain('storageUsed', () => {

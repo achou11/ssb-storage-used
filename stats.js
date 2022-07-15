@@ -4,19 +4,15 @@ const clarify = require('clarify-error')
 const trammel = require('trammel')
 const { newLogPath, indexesPath, jitIndexesPath } = require('ssb-db2/defaults')
 
-const TRAMMEL_OPTIONS = { type: 'raw' }
+const TRAMMEL_OPTIONS = /** @type {const} */ ({ type: 'raw' })
 
 /**
- * @typedef {import('./types').StatsPromiseSettledResults} StatsPromiseSettledResults
- */
-
-/**
- * @typedef {import('./types').StatsPromiseFulfilledResults} StatsPromiseFulfilledResults
+ * @typedef {import('./types/helpers').StatsPromiseFulfilledResults} StatsPromiseFulfilledResults
  */
 
 /**
  * @param {string} dir
- * @param {import('./types').CB<any>} cb
+ * @param {import('./types/helpers').CB<*>} cb
  */
 function getStats(dir, cb) {
   const blobsPath = path.join(dir, 'blobs')
@@ -29,7 +25,7 @@ function getStats(dir, cb) {
     trammel(db2IndexesPath, TRAMMEL_OPTIONS),
     trammel(db2JitIndexesPath, TRAMMEL_OPTIONS),
     getLogFileSize(db2LogPath),
-  ]).then((/** @type {StatsPromiseSettledResults} */ results) => {
+  ]).then((results) => {
     const rejectedResults = /** @type {PromiseRejectedResult[]} */ (
       results.filter((r) => r.status === 'rejected')
     )
