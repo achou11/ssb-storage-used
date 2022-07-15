@@ -10,8 +10,9 @@
     "format": "prettier --write \"*.{js,ts}\"",
     "format-staged": "pretty-quick --staged --pattern \"*.{js,ts}\"",
     "lint": "tsc",
-    "test": "tape test | tap-arc",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "standard-version",
+    "test": "tape test | tap-arc"
   },
   "repository": {
     "type": "git",
@@ -21,13 +22,17 @@
     "ssb"
   ],
   "author": "Andrew Chou <andrewchou@fastmail.com>",
+  "contributors": [
+    "Andre Staltz <contact@staltz.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/achou11/ssb-storage-used/issues"
   },
   "homepage": "https://github.com/achou11/ssb-storage-used#readme",
   "files": [
-    "*.js"
+    "*.js",
+    "types/helpers.d.ts"
   ],
   "dependencies": {
     "bipf": "^1.9.0",
@@ -52,6 +57,7 @@
     "ssb-db2": "^4.2.0",
     "ssb-fixtures": "^3.0.4",
     "ssb-keys": "^8.4.0",
+    "standard-version": "^9.5.0",
     "tap-arc": "^0.3.4",
     "tape": "^5.5.3",
     "tmp": "^0.2.1",
