@@ -1,4 +1,4 @@
-const fs = require('fs/promises')
+const fs = require('fs')
 const path = require('path')
 const clarify = require('clarify-error')
 const trammel = require('trammel')
@@ -59,9 +59,10 @@ function getStats(dir, cb) {
  */
 function getLogFileSize(logPath) {
   return new Promise((res, rej) => {
-    fs.stat(logPath)
-      .then(({ size }) => res(size))
-      .catch(rej)
+    fs.stat(logPath, (err, stats) => {
+      if (err) rej(err)
+      else res(stats.size)
+    })
   })
 }
 
