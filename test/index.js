@@ -99,16 +99,19 @@ test('stream', (t) => {
 
   pull(
     sbot.storageUsed.stream(),
-    pull.collect((err, chunks) => {
-      t.ok(!chunks.find((c) => c.length === 0), 'no empty chunks are returned')
+    pull.map((item) => {
+      const [feedId, bytes] = item
+      t.equal(typeof feedId, 'string', 'item[0] is a string')
+      t.equal(typeof bytes, 'number', 'item[1] is a number')
 
-      const flattened = chunks.flat()
-
-      const isMonotonicallyDecreasing = flattened
-        .map(({ total }) => total)
+      return item
+    }),
+    pull.collect((err, items) => {
+      const isMonotonicallyDecreasing = items
+        .map(([_, total]) => total)
         .every((current, index, array) => !index || array[index - 1] >= current)
 
-      const authorsCount = new Set(flattened.map(({ feed }) => feed)).size
+      const authorsCount = new Set(items.map(([feed]) => feed)).size
 
       t.ok(isMonotonicallyDecreasing, 'results are monotonically decreasing')
       t.equal(authorsCount, AUTHORS, 'every feed is accounted for')
