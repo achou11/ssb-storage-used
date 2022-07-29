@@ -7,6 +7,7 @@ const SecretStack = require('secret-stack')
 const caps = require('ssb-caps')
 const ssbKeys = require('ssb-keys')
 const pull = require('pull-stream')
+const Ref = require('ssb-ref')
 
 const SEED = 'tiny'
 const MESSAGES = 1000
@@ -101,7 +102,10 @@ test('stream', (t) => {
     sbot.storageUsed.stream(),
     pull.map((item) => {
       const [feedId, bytes] = item
+
       t.equal(typeof feedId, 'string', 'item[0] is a string')
+      t.ok(Ref.isFeed(feedId), 'item[0] is a valid feed id')
+
       t.equal(typeof bytes, 'number', 'item[1] is a number')
 
       return item

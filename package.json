@@ -57,6 +57,7 @@
     "ssb-db2": "^4.2.0",
     "ssb-fixtures": "^3.0.4",
     "ssb-keys": "^8.4.0",
+    "ssb-ref": "^2.16.0",
     "standard-version": "^9.5.0",
     "tap-arc": "^0.3.4",
     "tape": "^5.5.3",
