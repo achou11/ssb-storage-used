@@ -163,7 +163,11 @@ module.exports = class StorageUsed extends Plugin {
           cb(
             null,
             chunk
-              .map((c) => [c.key, toInt(c.value)])
+              .map((c) => {
+                const feedId = self._unpackKey(c.key)[1]
+                const bytes = toInt(c.value)
+                return /** @type {const} */ ([feedId, bytes])
+              })
               .sort((a, b) => b[1] - a[1])
           )
         })
