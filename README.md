@@ -54,24 +54,16 @@ ssb.storageUsed.stats((err, stats) => {
 })
 ```
 
-### `ssb.storageUsed.stream(): PullStream<Chunk> (muxrpc "source")`
+### `ssb.storageUsed.stream(): PullStream<[feedId, bytes]> (muxrpc "source")`
 
-Get a pull stream that sends a `Chunk`s sorted by feeds taking up the most storage to the least. A `Chunk` is an array of objects, where each object has the following fields:
-
-  - `feed`: the feed id
-  - `total`: the total number of bytes used by the feed
-
-The items in each chunk are sorted from the highest to lowest `total` values.
+Get a pull stream that sends a tuple where the first item is the feed id and the second item is the number of bytes used by that feed. The items returned by the stream are sorted from the highest to lowest `bytes` values.
 
 ```js
 pull(
   ssb.storageUsed.stream(),
-  pull.drain((chunk) => {
-    console.log(`Chunk has ${chunk.length} feeds`)
-
-    chunk.forEach(item => {
-      console.log(`${item.feed} uses ${item.total} bytes`)
-    })
+  pull.map((item) => {
+    const [feedId, bytes] = item
+    console.log(`Feed ${feedId} uses ${bytes} bytes`)
   })
 )
 ```

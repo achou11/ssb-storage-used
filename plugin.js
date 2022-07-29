@@ -163,8 +163,8 @@ module.exports = class StorageUsed extends Plugin {
           cb(
             null,
             chunk
-              .map((c) => ({ feed: c.key, total: toInt(c.value) }))
-              .sort((a, b) => b.total - a.total)
+              .map((c) => [c.key, toInt(c.value)])
+              .sort((a, b) => b[1] - a[1])
           )
         })
       )
@@ -172,7 +172,9 @@ module.exports = class StorageUsed extends Plugin {
 
     return pull(
       chunkedStream,
-      pull.filter((chunk) => chunk.length > 0)
+      pull.filter((chunk) => chunk.length > 0),
+      pull.map(pull.values),
+      pull.flatten()
     )
   }
 
