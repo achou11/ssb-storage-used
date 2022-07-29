@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/achou11/ssb-storage-used/compare/v2.0.0...v2.0.1) (2022-07-29)
+
+
+### Bug Fixes
+
+* return proper feed id in stream method ([#8](https://github.com/achou11/ssb-storage-used/issues/8)) ([2b299db](https://github.com/achou11/ssb-storage-used/commit/2b299db3828febb63b1e9906a428afba52daa689))
+
 ## [2.0.0](https://github.com/achou11/ssb-storage-used/compare/v1.0.0...v2.0.0) (2022-07-29)
 
 
