@@ -10,8 +10,11 @@ const pull = require('pull-stream')
 const Ref = require('ssb-ref')
 
 const SEED = 'tiny'
-const MESSAGES = 1000
-const AUTHORS = 10
+const MESSAGES = 24000
+const AUTHORS = 2
+
+/** Exact log size for the ssb-fixtures parameters above */
+const EXPECTED_LOG_SIZE = 18677760
 
 tmp.setGracefulCleanup()
 
@@ -58,7 +61,10 @@ test('generate fixture', (t) => {
       pull.drain(() => {
         setTimeout(() => {
           t.true(fs.existsSync(newLogPath), 'ssb-db2 migration completed')
-          sbot.close(true, t.end)
+          sbot.db.onDrain('storageUsed', () => {
+            t.pass('built storageUsed index')
+            sbot.close(true, t.end)
+          })
         }, 1000)
       })
     )
@@ -68,16 +74,14 @@ test('generate fixture', (t) => {
 test('stats', (t) => {
   const sbot = createSbot()
 
-  // Log size for seed 'tiny' with 1000 messages
-  const expectedLogSize = 851968
-
   sbot.storageUsed.stats((err, stats) => {
+    t.error(err, 'no error')
     t.equal(stats.blobs, 0, 'blob size is 0')
     t.ok(stats.indexes > 0, 'indexes is non-zero')
     t.equal(stats.jitIndexes, 0, 'jit indexes is 0')
     t.equal(
       stats.log,
-      expectedLogSize,
+      EXPECTED_LOG_SIZE,
       `log is expected size for seed '${SEED}'`
     )
 
