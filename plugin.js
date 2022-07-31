@@ -134,7 +134,6 @@ module.exports = class StorageUsed extends Plugin {
    * @returns {number}
    */
   getBytesStored(feedId) {
-    const prefix = this.feedIdToPrefix.get(feedId)
     return this.bytesStored.get(feedId) || 0
   }
 
@@ -203,7 +202,10 @@ module.exports = class StorageUsed extends Plugin {
   _calculatePrefix(bufferLength) {
     // If actual total is less than 1kb, round up to 1kb
     const kbTotal = Math.max(bufferLength, 1024) / 1024
-    const prefix = 99 - Math.floor(Math.log2(kbTotal) * PREFIX_FACTOR)
+    const prefix = Math.max(
+      0,
+      99 - Math.floor(Math.log2(kbTotal) * PREFIX_FACTOR)
+    )
     return this._createPrefixString(prefix)
   }
 
