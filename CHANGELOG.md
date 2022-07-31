@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/achou11/ssb-storage-used/compare/v2.0.1...v2.0.2) (2022-07-31)
+
+### Bug Fixes
+
+* Fix disappeared large feeds from prefix 00 ([b6bcade](https://github.com/achou11/ssb-storage-used/commit/b6bcade82559b510336b78f6c8836f28b0baed3c))
+
 ### [2.0.1](https://github.com/achou11/ssb-storage-used/compare/v2.0.0...v2.0.1) (2022-07-29)
 
 
