@@ -148,7 +148,7 @@ module.exports = class StorageUsed extends Plugin {
      */
     function chunkedStream(errOrEnd, cb) {
       if (errOrEnd) return cb(errOrEnd)
-      if (++prefix >= 100) return cb(true)
+      if (prefix >= 100) return cb(true)
 
       const stringPrefix = self._createPrefixString(prefix)
 
@@ -160,6 +160,7 @@ module.exports = class StorageUsed extends Plugin {
           values: true,
         }),
         pull.collect((err, chunk) => {
+          prefix++
           cb(
             null,
             chunk
