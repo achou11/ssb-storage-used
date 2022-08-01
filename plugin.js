@@ -137,6 +137,9 @@ module.exports = class StorageUsed extends Plugin {
     return this.bytesStored.get(feedId) || 0
   }
 
+  /**
+   * @returns {pull.Source<[string, number]>}
+   */
   stream() {
     const self = this
     let prefix = 0
@@ -174,6 +177,7 @@ module.exports = class StorageUsed extends Plugin {
       )
     }
 
+    // @ts-ignore
     return pull(
       chunkedStream,
       pull.filter((chunk) => chunk.length > 0),
