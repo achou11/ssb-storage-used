@@ -42,9 +42,11 @@ ssb.storageUsed.getBytesStored(ssb.id, (err, bytesStored) => {
     - `indexes: number`
     - `jitIndexes: number`
     - `log: number`
+    - `logUsedBytes: number`
+    - `logDeletedBytes: number`
   - `err` will return the **first** error that occurs when checking the various directories
 
-Get information about how much disk space `ssb/db2` takes up. This includes the log file, the indexes directories, and the blobs directories.
+Get information about how much disk space `ssb/db2` takes up. This includes the log file, the indexes directories, and the blobs directories. Additionally, `logUsedBytes` and `logDeletedBytes` are statistics about the internals of the log file, and come from [async-append-only-log](https://github.com/ssbc/async-append-only-log)'s `stats` method.
 
 ```js
 ssb.storageUsed.stats((err, stats) => {

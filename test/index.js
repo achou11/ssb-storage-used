@@ -78,6 +78,8 @@ test('stats', (t) => {
     t.error(err, 'no error')
     t.equal(stats.blobs, 0, 'blob size is 0')
     t.ok(stats.indexes > 0, 'indexes is non-zero')
+    t.ok(stats.logUsedBytes > 0, 'log records are non-zero')
+    t.equal(stats.logDeletedBytes , 0, 'log deleted records are zero')
     t.equal(stats.jitIndexes, 0, 'jit indexes is 0')
     t.equal(
       stats.log,
