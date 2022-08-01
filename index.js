@@ -50,7 +50,7 @@ module.exports = {
      */
     function stats(cb) {
       ssb.db.onDrain('storageUsed', () => {
-        getStats(config.path, cb)
+        getStats(ssb, config.path, cb)
       })
     }
 
