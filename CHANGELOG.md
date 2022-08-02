@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/achou11/ssb-storage-used/compare/v3.0.0...v3.0.1) (2022-08-02)
+
+
+### Bug Fixes
+
+* consider log ENOENT as size zero ([19ff1af](https://github.com/achou11/ssb-storage-used/commit/19ff1af88f15f3213469261c81a0eca2377e01db))
+
 ## [3.0.0](https://github.com/achou11/ssb-storage-used/compare/v2.0.2...v3.0.0) (2022-08-02)
 
 

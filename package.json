@@ -1,6 +1,6 @@
 {
   "name": "ssb-storage-used",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "secret stack plugin for getting storage usage information",
   "main": "index.js",
   "engines": {
