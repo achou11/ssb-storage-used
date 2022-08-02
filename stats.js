@@ -68,7 +68,8 @@ function getStats(ssb, dir, cb) {
 function getLogFileSize(logPath) {
   return new Promise((res, rej) => {
     fs.stat(logPath, (err, stats) => {
-      if (err) rej(err)
+      if (err && err.code === 'ENOENT') res(0)
+      else if (err) rej(err)
       else res(stats.size)
     })
   })
