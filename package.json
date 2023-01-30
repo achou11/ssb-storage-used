@@ -43,7 +43,7 @@
     "trammel": "~4.0.0"
   },
   "peerDependencies": {
-    "ssb-db2": "^4.2.0"
+    "ssb-db2": ">=4.2.0"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
